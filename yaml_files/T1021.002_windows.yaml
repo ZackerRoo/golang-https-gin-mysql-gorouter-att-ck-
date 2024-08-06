@@ -1,0 +1,18 @@
+attack_technique: T1021.002
+display_name: 'Remote Services: SMB/Windows Admin Shares'
+atomic_tests:
+- name: Map Admin Share PowerShell
+  description: |
+    Map Admin share utilizing PowerShell.
+  supported_platforms:
+  - windows
+  dependencies:
+  - description: Ensure PowerShell is available on the system.
+    prereq_command: |
+      if (Get-Command "powershell" -ErrorAction SilentlyContinue) { exit 0 } else { exit 1 }
+  executor:
+    command: |
+      New-PSDrive -Name G -PSProvider FileSystem -Root "\\Target\C$"
+    cleanup_command: |
+      # Remove-PSDrive -Name G
+

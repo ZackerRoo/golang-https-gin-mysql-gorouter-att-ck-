@@ -1,0 +1,18 @@
+attack_technique: T1001
+display_name: 'File Creation Test'
+atomic_tests:
+- name: Linux File Creation Test
+  description: |
+    This atomic test creates a file on a Linux platform and writes some content to it.
+  supported_platforms:
+  - linux
+  dependencies:
+  - prereq_command: |
+      if [ -f /tmp/linux_test_file ]; then exit 0; else exit 1; fi;
+    get_prereq_command: |
+      touch /tmp/linux_test_file
+  executor:
+    command: |
+      echo "This is a test file created on Linux." > /tmp/linux_test_file
+    cleanup_command: |
+      rm -f /tmp/linux_test_file

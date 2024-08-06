@@ -1,0 +1,27 @@
+attack_technique: T1197
+display_name: BITS Jobs
+atomic_tests:
+- name: Bitsadmin Download (PowerShell)
+  auto_generated_guid: f63b8bc4-07e5-4112-acba-56f646f3f0bc
+  description: |
+    This test simulates an adversary leveraging bitsadmin.exe to download
+    and execute a payload leveraging PowerShell
+
+    Upon execution you will find a github markdown file downloaded to the Temp directory
+  supported_platforms:
+  - windows
+  dependency_executor_name: powershell
+  dependencies:
+  - description: |
+      Ensure the remote file is available at the specified URL (C:\AtomicTests\source\T1197\src\T1197.md)
+    prereq_command: |
+      if (Test-Path "C:\AtomicTests\source\T1197\src\T1197.md") {exit 0} else {exit 1}
+    get_prereq_command: |
+      New-Item -Type Directory (split-path "C:\AtomicTests\source\T1197\src\T1197.md") -ErrorAction ignore | Out-Null
+      Invoke-WebRequest "https://raw.githubusercontent.com/redcanaryco/atomic-red-team/master/atomics/T1197/T1197.md" -OutFile "C:\AtomicTests\source\T1197\src\T1197.md"
+  executor:
+    command: |
+      Start-BitsTransfer -Priority foreground -Source "C:\AtomicTests\source\T1197\src\T1197.md" -Destination $env:TEMP\bitsadmin2_flag.ps1
+    cleanup_command: |
+      Remove-Item $env:TEMP\bitsadmin2_flag.ps1 -ErrorAction Ignore
+    name: powershell

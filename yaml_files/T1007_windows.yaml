@@ -1,0 +1,17 @@
+attack_technique: T1007
+display_name: System Service Discovery
+atomic_tests:
+- name: System Service Discovery
+  description: |
+    Identify system services.
+
+    Upon successful execution, the script will execute service commands with expected results to stdout.
+  supported_platforms:
+  - windows
+  executor:
+    command: |
+      cmd.exe /c "sc query state= all & tasklist.exe & sc query"
+    cleanup_command: |
+      Write-Host "No cleanup required"
+    name: powershell
+

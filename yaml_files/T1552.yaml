@@ -1,0 +1,35 @@
+attack_technique: T1552
+display_name: 'Unsecured Credentials Test'
+atomic_tests:
+- name: AWS - Retrieve EC2 Password Data
+  description: |
+    This atomic runs an API call GetPasswordData to simulate an attacker attempting to retrieve RDP passwords on Windows EC2 instances.
+  supported_platforms:
+  - linux
+  - macos
+  - iaas:aws
+  dependencies:
+  - prereq_command: |
+      if [ -f /tmp/stratus/stratus ]; then exit 0; else exit 1; fi;
+    get_prereq_command: |
+      mkdir -p /tmp/stratus
+      if [ "$(uname)" == "Darwin" ]; then
+        DOWNLOAD_URL=$(curl -s https://api.github.com/repos/DataDog/stratus-red-team/releases/latest | grep browser_download_url | grep Darwin_x86_64 | cut -d '"' -f 4)
+        wget -q -O /tmp/stratus/stratus-red-team-latest.tar.gz $DOWNLOAD_URL
+        tar -xzvf /tmp/stratus/stratus-red-team-latest.tar.gz --directory /tmp/stratus/
+      elif [ "$(expr substr $(uname) 1 5)" == "Linux" ]; then
+        DOWNLOAD_URL=$(curl -s https://api.github.com/repos/DataDog/stratus-red-team/releases/latest | grep browser_download_url | grep Linux_x86_64 | cut -d '"' -f 4)
+        wget -q -O /tmp/stratus/stratus-red-team-latest.tar.gz $DOWNLOAD_URL
+        tar -xzvf /tmp/stratus/stratus-red-team-latest.tar.gz --directory /tmp/stratus/
+      fi
+  executor:
+    command: |
+      export AWS_REGION=us-west-2
+      cd /tmp/stratus
+      ./stratus warmup aws.credential-access.ec2-get-password-data
+      ./stratus detonate aws.credential-access.ec2-get-password-data --force
+    cleanup_command: |
+      export AWS_REGION=us-west-2
+      rm -rf /root/.stratus-red-team || true
+      cd /tmp/stratus
+      ./stratus cleanup --all

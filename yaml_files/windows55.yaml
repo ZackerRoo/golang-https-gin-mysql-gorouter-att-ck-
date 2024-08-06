@@ -1,0 +1,24 @@
+attack_technique: T1074.001
+display_name: 'Data Staged: Local Data Staging'
+atomic_tests:
+- name: Zip a Folder with PowerShell for Staging in Temp
+  auto_generated_guid: a57fbe4b-3440-452a-88a7-943531ac872a
+  description: |
+    Use living off the land tools to zip a file and stage it in the Windows temporary folder for later exfiltration. Upon execution, Verify that a zipped folder named Folder_to_zip.zip
+    was placed in the temp directory.
+  supported_platforms:
+  - windows
+  dependencies:
+  - description: |
+      Folder to zip must be downloaded
+    prereq_command: |
+      if (Test-Path "PathToAtomicsFolder\T1074.001\bin\Folder_to_zip\T1074.txt") {exit 0} else {exit 1}
+    get_prereq_command: |
+      New-Item -ItemType Directory -Path "PathToAtomicsFolder\T1074.001\bin\Folder_to_zip" -Force | Out-Null
+      Invoke-WebRequest -Uri "https://github.com/redcanaryco/atomic-red-team/raw/master/atomics/T1074.001/bin/Folder_to_zip/T1074.txt" -OutFile "PathToAtomicsFolder\T1074.001\bin\Folder_to_zip\T1074.txt"
+  executor:
+    command: |
+      Compress-Archive -Path "PathToAtomicsFolder\T1074.001\bin\Folder_to_zip" -DestinationPath "$env:TEMP\Folder_to_zip.zip" -Force
+    cleanup_command: |
+      Remove-Item -Path "$env:TEMP\Folder_to_zip.zip" -ErrorAction Ignore
+    name: powershell

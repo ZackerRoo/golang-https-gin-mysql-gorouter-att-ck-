@@ -1,0 +1,18 @@
+attack_technique: T1000
+display_name: 'Windows File Creation Test'
+atomic_tests:
+- name: Create a file and write content on Windows
+  description: |
+    This atomic test creates a file named `C:\test_windows_file.txt` and writes "This is a test file created on Windows." into it.
+  supported_platforms:
+  - windows
+  dependencies:
+  - prereq_command: |
+      if (Test-Path 'C:\test_windows_dependency.txt') { exit 0 } else { exit 1 }
+    get_prereq_command: |
+      New-Item -Path 'C:\test_windows_dependency.txt' -ItemType File -Value "This is a dependency file for Windows."
+  executor:
+    command: |
+      New-Item -Path 'C:\test_windows_file.txt' -ItemType File -Value "This is a test file created on Windows."
+    cleanup_command: |
+      Remove-Item -Path 'C:\test_windows_file.txt'
