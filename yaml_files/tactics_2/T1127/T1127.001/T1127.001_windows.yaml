@@ -1,0 +1,24 @@
+attack_technique: T1127.001
+display_name: 'Trusted Developer Utilities Proxy Execution: MSBuild'
+atomic_tests:
+- name: MSBuild Bypass Using Inline Tasks (C#)
+  auto_generated_guid: 58742c0f-cb01-44cd-a60b-fb26e8871c93
+  description: |
+    Executes the code in a project file using msbuild.exe. The default C# project example file (T1127.001.csproj) will simply print "Hello From a Code Fragment" and "Hello From a Class." to the screen.
+  supported_platforms:
+  - windows
+  dependency_executor_name: powershell
+  dependencies:
+  - description: |
+      Project file must exist on disk at specified location (C:\AtomicTests\T1127.001\src\T1127.001.csproj)
+    prereq_command: |
+      if (Test-Path "C:\AtomicTests\T1127.001\src\T1127.001.csproj") {exit 0} else {exit 1}
+    get_prereq_command: |
+      New-Item -Type Directory (split-path "C:\AtomicTests\T1127.001\src\T1127.001.csproj") -ErrorAction ignore | Out-Null
+      Invoke-WebRequest "https://github.com/redcanaryco/atomic-red-team/raw/master/atomics/T1127.001/src/T1127.001.csproj" -OutFile "C:\AtomicTests\T1127.001\src\T1127.001.csproj"
+  executor:
+    command: |
+      & "C:\Windows\Microsoft.NET\Framework\v4.0.30319\msbuild.exe" "C:\AtomicTests\T1127.001\src\T1127.001.csproj"
+    cleanup_command: |
+      Remove-Item -Path "C:\AtomicTests\T1127.001\src\T1127.001.csproj" -Force -ErrorAction Ignore
+    name: powershell

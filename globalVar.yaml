@@ -1,0 +1,4 @@
+output_file: "C:\\Windows\\Temp\\lsass_dump.dmp"
+procdump_exe: "C:\\AtomicTests\\ExternalPayloads\\procdump.exe"
+process: "calc.exe"
+payload_path: "C:\\Windows\\System32\\calc.exe"

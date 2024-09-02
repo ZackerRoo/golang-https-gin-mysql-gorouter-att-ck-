@@ -1,0 +1,21 @@
+attack_technique: T1003.008
+display_name: 'OS Credential Dumping: /etc/passwd, /etc/master.passwd and /etc/shadow'
+atomic_tests:
+- name: Access /etc/shadow (Local)
+  description: |
+    /etc/shadow file is accessed in Linux environments
+  supported_platforms:
+  - linux
+  dependencies:
+  - prereq_command: |
+      if [ -f /etc/shadow ]; then exit 0; else exit 1; fi
+    get_prereq_command: |
+      echo "Prerequisite command not applicable"
+  executor:
+    command: |
+      sudo cat /etc/shadow > /tmp/T1003.008.txt
+      cat /tmp/T1003.008.txt
+    cleanup_command: |
+      rm -f /tmp/T1003.008.txt
+    name: bash
+    elevation_required: true

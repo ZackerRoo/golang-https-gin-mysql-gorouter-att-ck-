@@ -1,0 +1,18 @@
+attack_technique: T1046
+display_name: Network Service Discovery
+atomic_tests:
+- name: Port Scan
+  auto_generated_guid: 68e907da-2539-48f6-9fc9-257a78c05540
+  description: |
+    Scan ports to check for listening ports.
+
+    Upon successful execution, bash will perform a network connection against a single host and determine what ports are open in the range of 1-65535. Results will be via stdout.
+  supported_platforms:
+  - linux
+  - macos
+  executor:
+    command: |
+      for port in {1..65535}; do (2>/dev/null echo >/dev/tcp/10.50.1.207/$port) && echo port $port is open ; done
+    cleanup_command: |
+      echo "No cleanup required for this test."
+

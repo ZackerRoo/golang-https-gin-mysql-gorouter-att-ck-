@@ -1,0 +1,22 @@
+attack_technique: T1021.005
+display_name: 'Remote Services: VNC'
+atomic_tests:
+- name: Enable VNC Server
+  auto_generated_guid: 8a930abe-841c-4d4f-a877-72e9fe90b9ea
+  description: |
+    VNC (Virtual Network Computing) allows remote access to the desktop environment. 
+    Adversaries can abuse VNC to gain remote code execution and perform lateral movement.
+
+    References: https://www.realvnc.com/en/connect/download/vnc/linux/
+  supported_platforms:
+  - linux
+  executor:
+    name: sh
+    command: |
+      sudo apt-get update && sudo apt-get install -y tightvncserver
+      vncserver :1
+      echo "VNC server started on display :1"
+    cleanup_command: |
+      vncserver -kill :1
+      sudo apt-get remove -y tightvncserver
+    elevation_required: true

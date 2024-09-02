@@ -1,0 +1,17 @@
+attack_technique: T1021.006
+display_name: 'Remote Services: Windows Remote Management'
+atomic_tests:
+- name: Enable Windows Remote Management
+  auto_generated_guid: 9059e8de-3d7d-4954-a322-46161880b9cf
+  description: |
+    Powershell Enable WinRM
+
+    Upon successful execution, powershell will "Enable-PSRemoting" allowing for remote PS access.
+  supported_platforms:
+  - windows
+  executor:
+    command: |
+      Enable-PSRemoting -Force
+    cleanup_command: |
+      Disable-PSRemoting -Force
+
